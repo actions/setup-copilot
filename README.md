@@ -18,7 +18,7 @@ steps:
 | Input          | Description                                       | Required | Default          |
 | -------------- | ------------------------------------------------- | -------- | ---------------- |
 | `version`      | Version to install (`latest`, `prerelease`, or a specific version like `1.0.0`) | No | `latest` |
-| `github-token` | GitHub token for Copilot authentication           | No       | `github.token`   |
+| `github-token` | GitHub token for downloading Copilot CLI          | No       | `github.token`   |
 
 ## Outputs
 
@@ -47,7 +47,7 @@ steps:
 ```yaml
 - uses: actions/setup-copilot@v1
   with:
-    github-token: ${{ secrets.COPILOT_TOKEN }}
+    github-token: ${{ secrets.GH_TOKEN }}
 ```
 
 ## How it works

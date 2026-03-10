@@ -10,7 +10,7 @@ inputs:
     required: false
     default: "latest"
   github-token:
-    description: "GitHub token for Copilot authentication. Defaults to the workflow token."
+    description: "GitHub token to download Copilot CLI. Defaults to the workflow token."
     required: false
     default: ${{ github.token }}
 
@@ -28,16 +28,12 @@ runs:
         VERSION: ${{ inputs.version }}
         PREFIX: ${{ runner.tool_cache }}/copilot
       run: curl -fsSL https://gh.io/copilot-install | bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
 
     - name: Add to PATH
       shell: bash
       run: echo "${{ runner.tool_cache }}/copilot/bin" >> "$GITHUB_PATH"
-
-    - name: Set GITHUB_TOKEN
-      shell: bash
-      env:
-        GH_TOKEN: ${{ inputs.github-token }}
-      run: echo "GITHUB_TOKEN=${GH_TOKEN}" >> "$GITHUB_ENV"
 
     - name: Verify installation
       id: version
