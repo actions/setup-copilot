@@ -1,0 +1,47 @@
+name: "Setup Copilot CLI"
+description: "Install the GitHub Copilot CLI for use in GitHub Actions workflows"
+branding:
+  icon: "terminal"
+  color: "blue"
+
+inputs:
+  version:
+    description: "Version of Copilot CLI to install (e.g. '1.0.0', 'latest', 'prerelease')"
+    required: false
+    default: "latest"
+  github-token:
+    description: "GitHub token for Copilot authentication. Defaults to the workflow token."
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  version:
+    description: "The version of Copilot CLI that was installed"
+    value: ${{ steps.version.outputs.version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Copilot CLI
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        PREFIX: ${{ runner.tool_cache }}/copilot
+      run: curl -fsSL https://gh.io/copilot-install | bash
+
+    - name: Add to PATH
+      shell: bash
+      run: echo "${{ runner.tool_cache }}/copilot/bin" >> "$GITHUB_PATH"
+
+    - name: Set GITHUB_TOKEN
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: echo "GITHUB_TOKEN=${GH_TOKEN}" >> "$GITHUB_ENV"
+
+    - name: Verify installation
+      id: version
+      shell: bash
+      run: |
+        copilot --version
+        echo "version=$(copilot --version | head -1)" >> "$GITHUB_OUTPUT"
