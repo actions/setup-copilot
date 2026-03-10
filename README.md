@@ -57,3 +57,11 @@ This action uses the [official Copilot CLI install script](https://gh.io/copilot
 ## License
 
 [MIT](LICENSE)
+
+## Contributions
+
+Contributions are welcome! See [Contributor's Guide](CONTRIBUTING.md)
+
+## Code of Conduct
+
+:wave: Be nice. See [our code of conduct](CODE_OF_CONDUCT.md)
