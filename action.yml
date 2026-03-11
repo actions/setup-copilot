@@ -27,9 +27,8 @@ runs:
       env:
         VERSION: ${{ inputs.version }}
         PREFIX: ${{ runner.tool_cache }}/copilot
-      run: curl -fsSL https://gh.io/copilot-install | bash
-      env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: curl -fsSL https://gh.io/copilot-install | bash
 
     - name: Add to PATH
       shell: bash
