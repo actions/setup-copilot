@@ -6,7 +6,7 @@ A GitHub Action to install the [GitHub Copilot CLI](https://github.com/github/co
 
 ```yaml
 steps:
-  - uses: actions/setup-copilot@v1
+  - uses: actions/setup-copilot@v0
     with:
       version: "latest" # optional, defaults to "latest"
       github-token: ${{ secrets.COPILOT_TOKEN }} # optional, defaults to github.token
@@ -31,13 +31,13 @@ steps:
 ### Install latest version
 
 ```yaml
-- uses: actions/setup-copilot@v1
+- uses: actions/setup-copilot@v0
 ```
 
 ### Install a specific version
 
 ```yaml
-- uses: actions/setup-copilot@v1
+- uses: actions/setup-copilot@v0
   with:
     version: "1.2.3"
 ```
@@ -45,7 +45,7 @@ steps:
 ### Use with a custom token
 
 ```yaml
-- uses: actions/setup-copilot@v1
+- uses: actions/setup-copilot@v0
   with:
     github-token: ${{ secrets.GH_TOKEN }}
 ```
