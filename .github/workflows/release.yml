@@ -68,5 +68,6 @@ jobs:
 
       - name: Update major version tag
         run: |
+          git fetch origin tag "${{ steps.version.outputs.new }}"
           git tag -f "${{ steps.version.outputs.major }}" "${{ steps.version.outputs.new }}"
           git push -f origin "${{ steps.version.outputs.major }}"
