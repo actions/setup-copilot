@@ -34,6 +34,59 @@ runs:
       shell: bash
       run: echo "${{ runner.tool_cache }}/copilot/bin" >> "$GITHUB_PATH"
 
+    - name: Check for unnecessary write permissions
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        API="$GITHUB_API_URL/repos/$GITHUB_REPOSITORY"
+        writes_found=()
+
+        # Probe write access by sending invalid requests to write endpoints.
+        # 422/409 = token has write permission (passed auth, failed validation)
+        # 403     = token does not have write permission
+        probe_write() {
+          local scope="$1" url="$2" method="${3:-POST}" body="${4:-\{\}}"
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X "$method" \
+            -H "Authorization: bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$url" -d "$body")
+          case "$code" in
+            2[0-9][0-9]|422|409) writes_found+=("$scope") ;;
+          esac
+        }
+
+        probe_write "actions"         "$API/actions/workflows/0/dispatches" POST '{"ref":"__probe__"}'
+        probe_write "checks"          "$API/check-runs"                     POST '{}'
+        probe_write "contents"        "$API/contents/__probe__"             PUT  '{"message":"probe"}'
+        probe_write "deployments"     "$API/deployments"                    POST '{}'
+        probe_write "issues"          "$API/issues"                         POST '{}'
+        probe_write "packages"        "$GITHUB_API_URL/user/packages/container/__nonexistent__/versions/0" DELETE ''
+        probe_write "pages"           "$API/pages"                          POST '{}'
+        probe_write "pull-requests"   "$API/pulls"                          POST '{}'
+        probe_write "security-events" "$API/code-scanning/sarifs"           POST '{}'
+        probe_write "statuses"        "$API/statuses/$GITHUB_SHA"           POST '{}'
+
+        if [ ${#writes_found[@]} -gt 0 ]; then
+          echo ""
+          echo "::warning::⚠️  The github-token passed to setup-copilot has write permissions: ${writes_found[*]}. This action only needs read access. Granting unnecessary write permissions is a security risk. Please scope your token with least-privilege permissions."
+          {
+            echo "### ⚠️ setup-copilot: Excessive Token Permissions"
+            echo ""
+            echo "The \`github-token\` input has **write** access to: \`${writes_found[*]}\`."
+            echo ""
+            echo "This action only needs read access to download the Copilot CLI."
+            echo "Unnecessary write permissions increase the blast radius if the token is compromised."
+            echo ""
+            echo "**Recommendation:** add a \`permissions\` block to your workflow:"
+            echo '```yaml'
+            echo "permissions:"
+            echo "  contents: read"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+        fi
+
     - name: Verify installation
       id: version
       shell: bash
