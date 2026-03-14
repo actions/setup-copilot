@@ -9,7 +9,7 @@ steps:
   - uses: actions/setup-copilot@v0
     with:
       version: "latest" # optional, defaults to "latest"
-      github-token: ${{ secrets.COPILOT_TOKEN }} # optional, defaults to github.token
+      github-token: ${{ secrets.GITHUB_TOKEN }} # optional, defaults to github.token
   - run: copilot --version
 ```
 
